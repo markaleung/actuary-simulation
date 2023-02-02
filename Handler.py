@@ -24,12 +24,17 @@ def test_fixed_template():
     config.set_insurance()
     insurance = make_template(template_class = Main.InsuranceTemplate)
     assert round(insurance.output_df.expected_reserves.values[0]) == 2266
+    # PQ 7.1
+    assert round(insurance.output_df.expected_reserves.values[20]) == 68675
+    # AQ 7.1
+    assert round(insurance.output_df.expected_reserves.values[30]) == 129322
     config.set_annuity()
     config.annuity_start_age = 60
     annuity = make_template(template_class = Main.AnnuityTemplate)
     assert round(annuity.output_df.expected_reserves.values[0]) == 390890
-    config.set_multiple() # fe15
+    config.set_multiple()
     multiple = make_template(template_class = Main.MultipleTemplate)
+    # fe15
     assert round(multiple.output_df.expected_reserves.values[20]) == 215469
 def test_random_saved():
     config.set_insurance()
