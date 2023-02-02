@@ -1,4 +1,4 @@
-import pandas as pd, random
+import pandas as pd, random, time
 from scipy.stats import norm
 
 '''Function Tree
@@ -53,7 +53,10 @@ class Config():
         df = self._read_df(sheet_name = sheet_name).drop('Simulation / Year', axis = 1).T
         assert df.min().min() >= 0
         assert df.max().max() <= 1
-        return df.applymap(self._norm_ppf)
+        timey = time.time()
+        normal_df = df.applymap(self._norm_ppf)
+        print(time.time() - timey)
+        return normal_df
     def set_dfs(self):
         self.rand_deaths = self._read_random(sheet_name = 'Rand Deaths')
         self.rand_int = self._read_random(sheet_name = 'Rand Int')
