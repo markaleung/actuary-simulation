@@ -20,6 +20,15 @@ def make_template(template_class) -> Main._Template:
     template.calculate_expected_reserves()
     config.random_condition, config.start_policies = random_condition, start_policies
     return template
+def test_annuity_yield():
+    config.set_annuity()
+    config.annuity_start_age = 65
+    middle_interest = 0.035
+    for interest in middle_interest - 0.01, middle_interest, middle_interest + 0.01:
+        config.mean_interest = interest
+        annuity = make_template(template_class = Main.AnnuityTemplate)
+        annuity_yield = config.claim/annuity.output_df.expected_reserves.values[0]
+        print([round(value * 100, 2) for value in [interest, annuity_yield]])
 def test_insurance_template():
     config.set_insurance()
     insurance = make_template(template_class = Main.InsuranceTemplate)
@@ -72,6 +81,7 @@ def test_multiple():
     tester_multiple.fe12_fe14()
     tester_multiple.fe16()    
 def test_all():
+    test_annuity_yield()
     test_insurance_template()
     test_annuity_template()
     test_multiple_template()
