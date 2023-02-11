@@ -1,4 +1,4 @@
-import Main, Tester, Config
+import Main, Tester, Config, os
 
 '''Module Tree
 Handler
@@ -72,14 +72,17 @@ def test_multiple():
 def test_all():
     test_fixed_template()
     test_random_saved()
-    test_insurance()
-    test_insurance_years()
-    test_endowment()
-    test_annuity()
-    test_investment()
-    test_multiple()
+    if SIMULATE:
+        test_insurance()
+        test_insurance_years()
+        test_endowment()
+        test_annuity()
+        test_investment()
+        test_multiple()
 
-config = Config.Config()
+os.chdir(os.path.dirname(__file__))
+SIMULATE = True
+config = Config.Config(SIMULATE)
 if __name__=='__main__':
     pass
     test_all()

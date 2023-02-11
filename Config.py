@@ -18,7 +18,8 @@ set_multiple
 '''
 
 class Config():
-    def __init__(self):
+    def __init__(self, simulate):
+        self.simulate = simulate
         self.set_other()
         self.set_dfs()
         self.set_insurance()
@@ -58,11 +59,12 @@ class Config():
         print(time.time() - timey)
         return normal_df
     def set_dfs(self):
-        self.rand_deaths = self._read_random(sheet_name = 'Rand Deaths')
-        self.rand_int = self._read_random(sheet_name = 'Rand Int')
+        if self.simulate:
+            self.rand_deaths = self._read_random(sheet_name = 'Rand Deaths')
+            self.rand_int = self._read_random(sheet_name = 'Rand Int')
+            self.total_simulations = len(self.rand_deaths.columns)
         self.input_df1 = self._read_input(sheet_name = 'Sheet1')
         self.input_df2 = self._read_input(sheet_name = 'Sheet2')
-        self.total_simulations = len(self.rand_deaths.columns)
     def set_insurance(self):
         self.claim = 400000
         self.premium = 2265.98
