@@ -20,7 +20,7 @@ def make_template(template_class) -> Main._Template:
     template.calculate_expected_reserves()
     config.random_condition, config.start_policies = random_condition, start_policies
     return template
-def test_fixed_template():
+def test_insurance_template():
     config.set_insurance()
     insurance = make_template(template_class = Main.InsuranceTemplate)
     assert round(insurance.output_df.expected_reserves.values[0]) == 2266
@@ -28,10 +28,12 @@ def test_fixed_template():
     assert round(insurance.output_df.expected_reserves.values[20]) == 68675
     # AQ 7.1
     assert round(insurance.output_df.expected_reserves.values[30]) == 129322
+def test_annuity_template():
     config.set_annuity()
     config.annuity_start_age = 60
     annuity = make_template(template_class = Main.AnnuityTemplate)
     assert round(annuity.output_df.expected_reserves.values[0]) == 390890
+def test_multiple_template():
     config.set_multiple()
     multiple = make_template(template_class = Main.MultipleTemplate)
     # fe15
@@ -70,7 +72,9 @@ def test_multiple():
     tester_multiple.fe12_fe14()
     tester_multiple.fe16()    
 def test_all():
-    test_fixed_template()
+    test_insurance_template()
+    test_annuity_template()
+    test_multiple_template()
     test_random_saved()
     if SIMULATE:
         test_insurance()
