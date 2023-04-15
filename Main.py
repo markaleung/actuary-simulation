@@ -14,11 +14,12 @@ Insurance: claims use deaths, premiums in all years
         Multiple: death claim is years * premium, survival claim in last year
             MultipleDeduct: InsuranceDeduct, expected * 1.2 from year 5 to 18
 _Template: calculate expected reserves for others to use
-    InsuranceTemplate: Insurance
+    InsuranceTemplate: Insurance, expected reserves
         EndowmentTemplate: Endowment
-    AnnuityTemplate: Annuity, don't round
-    InvestmentTemplate: Investment, don't round
-    MultipleTemplate: Multiple, don't round
+    AnnuityTemplate: Annuity, expected reserves, don't round
+        AnnuityIncrementTemplate: AnnuityIncrement
+    InvestmentTemplate: Investment, expected reserves, don't round
+    MultipleTemplate: Multiple, expected reserves, don't round
 '''
 '''Function Tree
 __init__
@@ -151,6 +152,7 @@ class InsuranceAdd(InsuranceExpected):
 # Endowment
 class Endowment(Insurance):
     def _load_transform_df(self):
+        # Policy is only 30 years
         self.years = 30
         self.input_df = self.config.input_df1.copy()
         self.input_df = self.input_df[:self.years+1].reset_index(drop = True)
@@ -182,6 +184,10 @@ class AnnuityDeduct(Annuity, InsuranceDeduct):
         super().__init__(config)
         self.max_year = 20 # Bug fix AQ7.5: Insurance is 30, annuity is 20
         self.deduct_threshold = 1.211
+class AnnuityIncrement(Annuity):
+    def _calculate_claims(self):
+        # Claims are paid to alive, not dead
+        self.output_df['claims'] = self.output_df.policies * self.config.claim * 1.03 ** self.output_df.index
 
 # Cut Years
 class _CutYears(Insurance):
@@ -234,6 +240,7 @@ class _Template(Insurance):
         start_policies = self.output_df.policies.values[year]
         # Use nan to avoid divide by 0 warning
         start_policies = float('nan') if start_policies == 0 else start_policies
+        # Ensures that discount starts from 1, even at year n > 1
         self.multiplier = (1+self.config.mean_interest) ** year / start_policies
     def calculate_expected_reserves(self):
         # Discount doesn't depend on start year, so only needs to be calculated once
@@ -244,8 +251,8 @@ class InsuranceTemplate(_Template):
         super()._calculate_expected_reserves_one_year(year)
         future_premiums = (self.output_df.policies[year+1:] * self.discount[year+1:]).sum()
         # Claims are based on previous year's deaths
-        future_claims = (self.output_df.deaths[year:-1] * self.discount[year+1:]).sum()
-        expected_reserves = (future_claims * self.config.claim - future_premiums * self.config.premium) * self.multiplier
+        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
+        expected_reserves = (future_claims - future_premiums * self.config.premium) * self.multiplier
         return expected_reserves
 class EndowmentTemplate(Endowment, InsuranceTemplate):
     pass
@@ -256,10 +263,12 @@ class AnnuityTemplate(Annuity, _Template):
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
         super()._calculate_expected_reserves_one_year(year)
         # Claims are based on number alive
-        future_claims = (self.output_df.policies[year+1:] * self.discount[year+1:]).sum()
+        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
         # Premium is excluded because annuities don't have premiums after year 0
-        expected_reserves = future_claims * self.config.claim * self.multiplier
+        expected_reserves = future_claims * self.multiplier
         return expected_reserves
+class AnnuityIncrementTemplate(AnnuityTemplate, AnnuityIncrement):
+    pass
 class InvestmentTemplate(Investment, _Template):
     def __init__(self, config):
         super().__init__(config)

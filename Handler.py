@@ -24,11 +24,12 @@ def test_annuity_yield():
     config.set_annuity()
     config.annuity_start_age = 65
     middle_interest = 0.035
-    for interest in middle_interest - 0.01, middle_interest, middle_interest + 0.01:
-        config.mean_interest = interest
-        annuity = make_template(template_class = Main.AnnuityTemplate)
-        annuity_yield = config.claim/annuity.output_df.expected_reserves.values[0]
-        print([round(value * 100, 2) for value in [interest, annuity_yield]])
+    for template in Main.AnnuityTemplate, Main.AnnuityIncrementTemplate:
+        for interest in middle_interest - 0.01, middle_interest, middle_interest + 0.01:
+            config.mean_interest = interest
+            annuity = make_template(template_class = template)
+            annuity_yield = config.claim/annuity.output_df.expected_reserves.values[0]
+            print(template, [round(value * 100, 2) for value in [interest, annuity_yield]])
 def test_insurance_template():
     config.set_insurance()
     insurance = make_template(template_class = Main.InsuranceTemplate)
@@ -54,6 +55,7 @@ def test_random_saved():
     insurance.calculate_actual_reserves()
     if config.random_condition == 'random_saved':
         assert round(insurance.final_reserves) == 434802897, insurance.final_reserves
+# Simulations
 def test_insurance():
     tester_insurance = Tester.Insurance(config, make_template)
     tester_insurance.aq66_pq63()
@@ -80,6 +82,7 @@ def test_multiple():
     tester_multiple = Tester.Multiple(config, make_template)
     tester_multiple.fe12_fe14()
     tester_multiple.fe16()    
+# Handler
 def test_all():
     test_annuity_yield()
     test_insurance_template()
