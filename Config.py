@@ -60,6 +60,11 @@ class Config():
         return normal_df
     def set_dfs(self):
         if self.simulate:
+            '''
+            These contain random numbers for 200 simulations
+            Which numbers will be used depends on self.random_condition
+            See self.set_other(), self.norm_ppf()
+            '''
             self.rand_deaths = self._read_random(sheet_name = 'Rand Deaths')
             self.rand_int = self._read_random(sheet_name = 'Rand Int')
             self.total_simulations = len(self.rand_deaths.columns)
