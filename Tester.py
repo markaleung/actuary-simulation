@@ -118,8 +118,6 @@ class Annuity(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_annuity()
-        # Needed for aq75
-        self.template_class = Main.AnnuityTemplate
     def pq74_aq75(self):
         self.config.annuity_start_age = 60
         self.make_simulations(insurance_class = Main.Annuity)
@@ -136,6 +134,7 @@ class Annuity(Tester):
         self.monte_carlo(premium = premium * 0.9, answer = 0.035)
         self.monte_carlo(premium = premium * 1.1, answer = 0.955)
     def aq75(self):
+        self.template_class = Main.AnnuityTemplate
         self.config.annuity_start_age = 60
         self.make_simulations(insurance_class = Main.AnnuityDeduct)
         self.monte_carlo(premium = 450000, answer = 0.95)
@@ -150,12 +149,11 @@ class Multiple(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_multiple()
-        # Needed for fe16
-        self.template_class = Main.MultipleTemplate
     def fe12_fe14(self):
         self.make_simulations(insurance_class = Main.Multiple)
         self.monte_carlo(premium = 7500, answer = 0.67)
         self.monte_carlo(premium = 8900, answer = 0.95) # fe_14
     def fe16(self):
+        self.template_class = Main.MultipleTemplate
         self.make_simulations(insurance_class = Main.MultipleDeduct)
         self.monte_carlo(premium = 7500, answer = 0.55)

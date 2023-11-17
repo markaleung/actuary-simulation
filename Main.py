@@ -111,6 +111,7 @@ class Insurance():
         assert self.config.premium > 0
         self.output_df['premiums'] = self.output_df.policies * self.config.premium
     def _adjust_reserves(self, row, temp_reserves: float) -> float:
+        # Used by InsuraceExpected's child classes only
         return temp_reserves
     def calculate_actual_reserves(self, template = None):
         # template is used in classes inheriting from InsuranceExpected
