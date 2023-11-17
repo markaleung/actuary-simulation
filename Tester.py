@@ -1,4 +1,4 @@
-import tqdm, Main, Config, typing
+import tqdm, Main, Config, typing, Template
 
 '''Class Tree
 Tester: % of simulations with end reserves > 0
@@ -28,7 +28,7 @@ monte_carlo
 class Tester():
     def __init__(self, config: Config.Config, make_template: typing.Callable):
         self.config = config
-        self.make_template = make_template
+        self.make_template = Template.make_template
         self.template_class = None
     def make_simulations(self, insurance_class):
         self.simulations = []
