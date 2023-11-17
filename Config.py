@@ -20,17 +20,9 @@ set_multiple
 class Config():
     def __init__(self, simulate):
         self.simulate = simulate
-        self.set_other()
-        self.set_dfs()
-        self.set_insurance()
-    def set_other(self):
-        '''This value can be changed: 
-        fixed (always use mean)
-        random_saved (use random numbers from excel)
-        random_dynamic (use random numbers from python)'''
-        self.random_condition = 'random_saved'
         # Must be between 40 and 110
         self.annuity_start_age = 60
+        self.set_insurance()
     def _read_df(self, sheet_name: str) -> pd.DataFrame:
         print(sheet_name)
         return pd.read_excel('Lesson_6_7_Python.xlsx', sheet_name=sheet_name)
@@ -58,12 +50,18 @@ class Config():
         normal_df = df.applymap(self._norm_ppf)
         print(time.time() - timey)
         return normal_df
-    def set_dfs(self):
+    def set_dfs(self, random_condition: str):
+        '''This value can be changed: 
+        fixed (always use mean)
+        random_saved (use random numbers from excel)
+        random_dynamic (use random numbers from python)'''
+        self.random_condition = random_condition
         if self.simulate:
             '''
             These contain random numbers for 200 simulations
             Which numbers will be used depends on self.random_condition
             See self.set_other(), self.norm_ppf()
+            It can be disabled because running 200 simulations is very slow
             '''
             self.rand_deaths = self._read_random(sheet_name = 'Rand Deaths')
             self.rand_int = self._read_random(sheet_name = 'Rand Int')

@@ -33,7 +33,7 @@ def test_annuity_yield():
 def test_insurance_template():
     config.set_insurance()
     insurance = make_template(template_class = Main.InsuranceTemplate)
-    assert round(insurance.output_df.expected_reserves.values[0]) == 2266
+    assert round(insurance.output_df.expected_reserves.values[0]) == 2266, round(insurance.output_df.expected_reserves.values[0])
     # PQ 7.1
     assert round(insurance.output_df.expected_reserves.values[20]) == 68675
     # AQ 7.1
@@ -100,6 +100,7 @@ def test_all():
 os.chdir(os.path.dirname(__file__))
 SIMULATE = True
 config = Config.Config(SIMULATE)
+config.set_dfs(random_condition = 'random_saved')
 if __name__=='__main__':
     pass
     test_all()
