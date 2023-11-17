@@ -113,6 +113,8 @@ class Insurance():
     def _adjust_reserves(self, row, temp_reserves: float) -> float:
         return temp_reserves
     def calculate_actual_reserves(self, template = None):
+        # template is used in classes inheriting from InsuranceExpected
+        # Since Simulatinos often change premiums, calculating premiums after process_df means that claims and interest (slow) don't have to be recalculated every time
         self._calculate_premiums()
         reserves = [self.output_df.premiums.values[0]]
         for row in self.output_df[1:].itertuples():
@@ -122,6 +124,7 @@ class Insurance():
         self.final_reserves = reserves[-1]
 class InsuranceInterest(Insurance):
     def calculate_actual_reserves(self, template = None):
+        # template is used in classes inheriting from InsuranceExpected
         # Recalculate interest when mean and sd interest have changed
         self._calculate_interest()
         super().calculate_actual_reserves()
@@ -254,8 +257,6 @@ class InsuranceTemplate(_Template):
         future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
         expected_reserves = (future_claims - future_premiums * self.config.premium) * self.multiplier
         return expected_reserves
-class EndowmentTemplate(Endowment, InsuranceTemplate):
-    pass
 class AnnuityTemplate(Annuity, _Template):
     def __init__(self, config):
         super().__init__(config)
@@ -269,7 +270,7 @@ class AnnuityTemplate(Annuity, _Template):
         return expected_reserves
 class AnnuityIncrementTemplate(AnnuityTemplate, AnnuityIncrement):
     pass
-class InvestmentTemplate(Investment, _Template):
+class InvestmentTemplate(Investment, _Template): # Not being used
     def __init__(self, config):
         super().__init__(config)
         self.round = False

@@ -29,6 +29,7 @@ class Tester():
     def __init__(self, config: Config.Config, make_template: typing.Callable):
         self.config = config
         self.make_template = make_template
+        self.template_class = None
     def make_simulations(self, insurance_class):
         self.simulations = []
         for i in tqdm.trange(self.config.total_simulations):
@@ -39,7 +40,7 @@ class Tester():
             self.simulations.append(simulation)
     def _set_simulation_variables(self):
         # Bug fix PQ7.3: make sure template uses updated premium
-        self.template = self.make_template(template_class = self.template_class)
+        self.template = None if self.template_class is None else self.make_template(template_class = self.template_class)
         self.positive_count = 0
     def _calculate_positive(self, simulation: Main.Insurance) -> float:
         return float(simulation.final_reserves >= 0)
@@ -62,6 +63,7 @@ class Insurance(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_insurance()
+        # Needed for pq73, aq73, pq72, aq72
         self.template_class = Main.InsuranceTemplate
     def aq66_pq63(self):
         self.make_simulations(insurance_class = Main.Insurance)
@@ -109,7 +111,6 @@ class Endowment(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_insurance()
-        self.template_class = Main.EndowmentTemplate
     def aq68(self):
         self.make_simulations(insurance_class = Main.Endowment)
         self.monte_carlo(premium = 7725, answer = 0.9)
@@ -117,6 +118,7 @@ class Annuity(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_annuity()
+        # Needed for aq75
         self.template_class = Main.AnnuityTemplate
     def pq74_aq75(self):
         self.config.annuity_start_age = 60
@@ -141,7 +143,6 @@ class Investment(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_investment()
-        self.template_class = Main.InvestmentTemplate
     def fe5(self):
         self.make_simulations(insurance_class = Main.Investment)
         self.monte_carlo(premium = 5000, answer = 0.13)
@@ -149,6 +150,7 @@ class Multiple(Tester):
     def __init__(self, config, make_template):
         super().__init__(config, make_template)
         self.config.set_multiple()
+        # Needed for fe16
         self.template_class = Main.MultipleTemplate
     def fe12_fe14(self):
         self.make_simulations(insurance_class = Main.Multiple)
