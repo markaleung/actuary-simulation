@@ -1,22 +1,6 @@
 import pandas as pd, random, time
 from scipy.stats import norm
 
-'''Function Tree
-__init__
-set_other
-set_dfs
-    _read_input
-        _read_df
-        _norm_ppf
-    _read_random
-        _read_df
-        _norm_ppf
-set_insurance
-set_annuity
-set_investment
-set_multiple
-'''
-
 class Config():
     def __init__(self, simulate):
         self.simulate = simulate

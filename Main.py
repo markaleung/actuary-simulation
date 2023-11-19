@@ -1,50 +1,5 @@
 import pandas as pd, math, Config
 
-'''Class Tree
-Insurance: claims use deaths, premiums in all years
-    InsuranceInterest: recalculate interest when calculating actual reserves
-    InsuranceExpected: expected = template.expected * policies
-        InsuranceDeduct: deduct when higher than expected * 1.5 from year 1 to 30
-        InsuranceAdd: add when lower than expected * 0.8
-    Endowment: 30 year policy, everyone dies at year 29
-    Annuity: claims use policies, premiums in year 0 only, adjustable start age
-        AnnuityDeduct: InsuranceDeduct, expected * 1.211 from year 1 to 20
-    _Cut Years: use self.input_df2, 25 year policy, last year is claim only
-        Investment: claim at end, no deaths
-        Multiple: death claim is years * premium, survival claim in last year
-            MultipleDeduct: InsuranceDeduct, expected * 1.2 from year 5 to 18
-_Template: calculate expected reserves for others to use
-    InsuranceTemplate: Insurance, expected reserves
-        EndowmentTemplate: Endowment
-    AnnuityTemplate: Annuity, expected reserves, don't round
-        AnnuityIncrementTemplate: AnnuityIncrement
-    InvestmentTemplate: Investment, expected reserves, don't round
-    MultipleTemplate: Multiple, expected reserves, don't round
-'''
-'''Function Tree
-__init__
-    _load_transform_df
-    _check_assertions
-process_df
-    _make_start_values
-    for each row in self.input_df
-        _update_deaths (Except Investment)
-            _make_random_variable
-        _append_row_to_output
-        _update_policies (Except Investment)
-    _make_output_df
-    _calculate_claims
-    _calculate_interest
-        _make_random_variable
-calculate_actual_reserves
-    _calculate_interest (Only InsuranceInterest)
-    _calculate_claims (Only Multiple)
-    _calculate_premiums
-    _adjust_reserves
-calculate_expected_reserves (Only Template)
-    _calculate_expected_reserves_one_year
-'''
-
 # Insurance
 class Insurance():
     # __init__

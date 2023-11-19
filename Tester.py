@@ -1,30 +1,5 @@
 import tqdm, Main, Config, typing
 
-'''Class Tree
-Tester: % of simulations with end reserves > 0
-    Insurance
-        InsuranceYear20: % of simulationss with year 20 reserves > 0
-        InsuranceYearCount: % of years with actual > expected
-    Endowment
-    Annuity
-    Investment
-    Multiple
-'''
-'''Function Tree
-__init__
-    Config.set_global_variables
-make_simulations
-    Main.__init__
-    Main.process_df
-monte_carlo
-    _set_simulation_variables
-        Handler.make_template
-    _run_simulations
-        Main.calculate_actual_reserves
-        _calculate_positive
-    _check_simulation_results
-'''
-
 class Tester():
     def __init__(self, config: Config.Config, make_template: typing.Callable):
         self.config = config
