@@ -4,7 +4,7 @@
     - The course used 1 excel spreadsheet for each simulation
     - There were 13 simulations each with 3 or 4 variations
     - It got very difficult to keep track of changes in different files
-    - In contrast, Python uses parent classes to write shared logic only once
+- In contrast, Python can use parent classes to write shared logic only once
 
 # Module Structure
 - Handler.py: calls all the functions in Tester.py
@@ -23,7 +23,7 @@
 ## Class Tree
 - Tester: count % of simulations with end reserves > 0
     - Insurance: Config.set_insurance, Main.Insurance(Intrest, Deduct, Add)
-        - InsuranceYear20: % of simulationss with year 20 reserves > 0, Main.InsuraceExpected
+        - InsuranceYear20: % of simulations with year 20 reserves > 0, Main.InsuraceExpected
         - InsuranceYearCount: % of years with actual > expected, Main.InsuraceExpected
     - Endowment: Config.set_insurance, Main.Endowment
     - Annuity: Config.set_annuity, Main.Annuity(Deduct)
@@ -44,7 +44,6 @@
         - Main.calculate_actual_reserves
         - _calculate_positive
     - _check_simulation_results
-
 
 # Main.py
 
@@ -93,13 +92,15 @@
     - _calculate_expected_reserves_one_year
 
 # Config.py
+
+## Explanation
 - set_dfs creates input data for policy, random numbers for simulations
 - Other set_something functions contain preset combinations of constants for different questions in the course
-    - claim
-    - premium
-    - mean_interest
+    - claim: amount claimed by each policyholder
+    - premium: premium paid by each policyholder
+    - mean_interest: interest rate is modelled as normal distribution with mean and sd
     - sd_interest
-    - start_policies
+    - start_policies: number of policyholders at start of policy
 
 ## Function Tree
 - __init__
