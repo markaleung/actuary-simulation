@@ -18,12 +18,12 @@ def test_annuity_yield():
     for template in Main.AnnuityTemplate, Main.AnnuityIncrementTemplate:
         for interest in middle_interest - 0.01, middle_interest, middle_interest + 0.01:
             config.mean_interest = interest
-            annuity = Template.make_template(template_class = template)
+            annuity = template_maker.make_template(template_class = template)
             annuity_yield = config.claim/annuity.output_df.expected_reserves.values[0]
             print(template, [round(value * 100, 2) for value in [interest, annuity_yield]])
 def test_insurance_template():
     config.set_insurance()
-    insurance = Template.make_template(template_class = Main.InsuranceTemplate)
+    insurance = template_maker.make_template(template_class = Main.InsuranceTemplate)
     assert round(insurance.output_df.expected_reserves.values[0]) == 2266, round(insurance.output_df.expected_reserves.values[0])
     # PQ 7.1
     assert round(insurance.output_df.expected_reserves.values[20]) == 68675
@@ -32,11 +32,11 @@ def test_insurance_template():
 def test_annuity_template():
     config.set_annuity()
     config.annuity_start_age = 60
-    annuity = Template.make_template(template_class = Main.AnnuityTemplate)
+    annuity = template_maker.make_template(template_class = Main.AnnuityTemplate)
     assert round(annuity.output_df.expected_reserves.values[0]) == 390890
 def test_multiple_template():
     config.set_multiple()
-    multiple = Template.make_template(template_class = Main.MultipleTemplate)
+    multiple = template_maker.make_template(template_class = Main.MultipleTemplate)
     # fe15
     assert round(multiple.output_df.expected_reserves.values[20]) == 215469
 def test_random_saved():
@@ -48,29 +48,29 @@ def test_random_saved():
         assert round(insurance.final_reserves) == 434802897, insurance.final_reserves
 # Simulations
 def test_insurance():
-    tester_insurance = Tester.Insurance(config, Template.make_template)
+    tester_insurance = Tester.Insurance(config)
     tester_insurance.aq66_pq63()
     tester_insurance.aq67()
     tester_insurance.pq73()
     tester_insurance.aq73()
 def test_insurance_years():
-    tester_insurance = Tester.InsuranceYear20(config, Template.make_template)
+    tester_insurance = Tester.InsuranceYear20(config)
     tester_insurance.pq72()
-    tester_insurance = Tester.InsuranceYearCount(config, Template.make_template)
+    tester_insurance = Tester.InsuranceYearCount(config)
     tester_insurance.aq72()
 def test_endowment():
-    tester_endowment = Tester.Endowment(config, Template.make_template)
+    tester_endowment = Tester.Endowment(config)
     tester_endowment.aq68()
 def test_annuity():
-    tester_annuity = Tester.Annuity(config, Template.make_template)
+    tester_annuity = Tester.Annuity(config)
     tester_annuity.pq74_aq75()
     tester_annuity.aq74()
     tester_annuity.aq75()
 def test_investment():
-    tester_investment = Tester.Investment(config, Template.make_template)
+    tester_investment = Tester.Investment(config)
     tester_investment.fe5()
 def test_multiple():
-    tester_multiple = Tester.Multiple(config, Template.make_template)
+    tester_multiple = Tester.Multiple(config)
     tester_multiple.fe12_fe14()
     tester_multiple.fe16()    
 # Handler
@@ -92,6 +92,7 @@ os.chdir(os.path.dirname(__file__))
 SIMULATE = True
 config = Config.Config(SIMULATE)
 config.set_dfs(random_condition = 'random_saved')
+template_maker = Template.TemplateMaker(config)
 if __name__=='__main__':
     pass
     test_all()
