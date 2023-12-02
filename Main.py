@@ -198,16 +198,17 @@ class _Template(Insurance):
     def _calculate_expected_reserves_one_year(self, year: int):
         pass
     def calculate_expected_reserves(self):
+        self._calculate_premiums()
         # Discount doesn't depend on start year, so only needs to be calculated once
         self.discount = self.output_df.index.map(lambda x: (1+self.config.mean_interest) ** -x)
         self.undiscount_years = (1+self.config.mean_interest) ** self.output_df.index
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) * self.undiscount_years / self.output_df.policies
 class InsuranceTemplate(_Template):
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        future_premiums = (self.output_df.policies[year+1:] * self.discount[year+1:]).sum()
+        future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
         # Claims are based on previous year's deaths
         future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
-        expected_reserves = future_claims - future_premiums * self.config.premium
+        expected_reserves = future_claims - future_premiums
         return expected_reserves
 class AnnuityTemplate(Annuity, _Template):
     def __init__(self, config):
@@ -227,9 +228,9 @@ class InvestmentTemplate(Investment, _Template): # Not being used
         self.round = False
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
         # Bug Fix: Same As Multiple Template
-        future_claims = self.output_df.policies[self.years] * self.discount[self.years] if year < self.years else 0
-        future_premiums = (self.output_df.policies[year+1:self.years] * self.discount[year+1:self.years]).sum()
-        expected_reserves = future_claims * self.config.claim - future_premiums * self.config.premium
+        future_claims = self.output_df.claims[self.years] * self.discount[self.years] if year < self.years else 0
+        future_premiums = (self.output_df.premiums[year+1:self.years] * self.discount[year+1:self.years]).sum()
+        expected_reserves = future_claims - future_premiums
         return expected_reserves
 class MultipleTemplate(Multiple, _Template):
     def __init__(self, config):
