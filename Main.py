@@ -195,8 +195,15 @@ class MultipleDeduct(Multiple, InsuranceDeduct):
 
 # Template
 class _Template(Insurance):
-    def _calculate_expected_reserves_one_year(self, year: int):
-        pass
+    def __init__(self, config):
+        super().__init__(config)
+        self.round = False
+    def _calculate_expected_reserves_one_year(self, year: int) -> float:
+        future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
+        # Claims are based on previous year's deaths
+        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
+        expected_reserves = future_claims - future_premiums
+        return expected_reserves
     def calculate_expected_reserves(self):
         self._calculate_premiums()
         '''
@@ -208,37 +215,14 @@ class _Template(Insurance):
         self.discount = (1+self.config.mean_interest) ** -self.output_df.index
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) / self.discount / self.output_df.policies
 class InsuranceTemplate(_Template):
-    def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
-        # Claims are based on previous year's deaths
-        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
-        expected_reserves = future_claims - future_premiums
-        return expected_reserves
-class AnnuityTemplate(Annuity, InsuranceTemplate):
     def __init__(self, config):
         super().__init__(config)
-        self.round = False
-class AnnuityIncrementTemplate(AnnuityTemplate, AnnuityIncrement):
+        self.round = True
+class AnnuityTemplate(Annuity, _Template):
+    pass
+class AnnuityIncrementTemplate(AnnuityIncrement, _Template):
     pass
 class InvestmentTemplate(Investment, _Template): # Not being used
-    def __init__(self, config):
-        super().__init__(config)
-        self.round = False
-    def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        # Bug Fix: Same As Multiple Template
-        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
-        future_premiums = (self.output_df.premiums[year+1:self.years] * self.discount[year+1:self.years]).sum()
-        expected_reserves = future_claims - future_premiums
-        return expected_reserves
+    pass
 class MultipleTemplate(Multiple, _Template):
-    def __init__(self, config):
-        super().__init__(config)
-        self.round = False
-    def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        # Bug Fix FE 15: disable survival claim for last row because expected reserves only includes year+1
-        future_survive = self.output_df.policies[self.years] * self.discount[self.years] if year < self.years else 0
-        future_claims = (self.output_df.deaths[year:-1] * self.discount[year+1:] * self.output_df.index[year+1:]).sum()
-        future_premiums = (self.output_df.premiums[year+1:self.years] * self.discount[year+1:self.years]).sum()
-        # Death claims are multiplied by premium
-        expected_reserves = future_survive * self.config.claim + (future_claims) * self.config.premium - future_premiums
-        return expected_reserves
+    pass
