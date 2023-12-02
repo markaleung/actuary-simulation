@@ -194,7 +194,7 @@ class MultipleDeduct(Multiple, InsuranceDeduct):
         self.deduct_threshold = 1.2
 
 # Template
-class _Template(Insurance):
+class _Template:
     def __init__(self, config):
         super().__init__(config)
         self.round = False
@@ -214,7 +214,7 @@ class _Template(Insurance):
         '''
         self.discount = (1+self.config.mean_interest) ** -self.output_df.index
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) / self.discount / self.output_df.policies
-class InsuranceTemplate(_Template):
+class InsuranceTemplate(Insurance, _Template):
     def __init__(self, config):
         super().__init__(config)
         self.round = True
