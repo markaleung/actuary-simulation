@@ -36,8 +36,8 @@ def test_annuity_template():
     assert round(annuity.output_df.expected_reserves.values[0]) == 390890
 def test_investment_template():
     config.set_investment()
-    investment = template_maker.make_template(template_class = Main.MultipleTemplate)
-    assert round(investment.output_df.expected_reserves.values[20]) == 64760
+    investment = template_maker.make_template(template_class = Main.InvestmentTemplate)
+    assert round(investment.output_df.expected_reserves.values[0]) == 17544
 def test_multiple_template():
     config.set_multiple()
     multiple = template_maker.make_template(template_class = Main.MultipleTemplate)
