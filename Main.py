@@ -201,6 +201,7 @@ class _Template(Insurance):
         start_policies = float('nan') if start_policies == 0 else start_policies
         # Ensures that discount starts from 1, even at year n > 1
         self.multiplier = (1+self.config.mean_interest) ** year / start_policies
+        # This function is finished differently by every child class
     def calculate_expected_reserves(self):
         # Discount doesn't depend on start year, so only needs to be calculated once
         self.discount = self.output_df.index.map(lambda x: (1+self.config.mean_interest) ** -x)
@@ -220,8 +221,10 @@ class AnnuityTemplate(Annuity, _Template):
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
         super()._calculate_expected_reserves_one_year(year)
         # Claims are based on number alive
+        # discount all claims to year 0
         future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
         # Premium is excluded because annuities don't have premiums after year 0
+        # undiscount future_claims from year 0 to current year 
         expected_reserves = future_claims * self.multiplier
         return expected_reserves
 class AnnuityIncrementTemplate(AnnuityTemplate, AnnuityIncrement):
