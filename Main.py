@@ -214,15 +214,10 @@ class InsuranceTemplate(_Template):
         future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
         expected_reserves = future_claims - future_premiums
         return expected_reserves
-class AnnuityTemplate(Annuity, _Template):
+class AnnuityTemplate(Annuity, InsuranceTemplate):
     def __init__(self, config):
         super().__init__(config)
         self.round = False
-    def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        # Claims are based on number alive
-        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
-        # Premium is excluded because annuities don't have premiums after year 0
-        return future_claims
 class AnnuityIncrementTemplate(AnnuityTemplate, AnnuityIncrement):
     pass
 class InvestmentTemplate(Investment, _Template): # Not being used
@@ -231,7 +226,7 @@ class InvestmentTemplate(Investment, _Template): # Not being used
         self.round = False
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
         # Bug Fix: Same As Multiple Template
-        future_claims = self.output_df.claims[self.years] * self.discount[self.years] if year < self.years else 0
+        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
         future_premiums = (self.output_df.premiums[year+1:self.years] * self.discount[year+1:self.years]).sum()
         expected_reserves = future_claims - future_premiums
         return expected_reserves

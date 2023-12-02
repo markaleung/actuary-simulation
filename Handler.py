@@ -34,6 +34,10 @@ def test_annuity_template():
     config.annuity_start_age = 60
     annuity = template_maker.make_template(template_class = Main.AnnuityTemplate)
     assert round(annuity.output_df.expected_reserves.values[0]) == 390890
+def test_investment_template():
+    config.set_investment()
+    investment = template_maker.make_template(template_class = Main.MultipleTemplate)
+    assert round(investment.output_df.expected_reserves.values[20]) == 64760
 def test_multiple_template():
     config.set_multiple()
     multiple = template_maker.make_template(template_class = Main.MultipleTemplate)
@@ -77,6 +81,7 @@ def test_multiple():
 def test_all():
     test_annuity_yield()
     test_insurance_template()
+    test_investment_template()
     test_annuity_template()
     test_multiple_template()
     test_random_saved()
