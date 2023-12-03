@@ -194,9 +194,17 @@ class MultipleDeduct(Multiple, InsuranceDeduct):
         self.deduct_threshold = 1.2
 
 # Template
+'''
+- Subclasses must inherit _Template first, 
+    - So that init uses self.round = False (from _Template) instead of self.round = True (from other classes)
+    - Except InsuranceTemplate, which uses self.round = True
+    - This is following the class's logic
+- Originally I had custom logic for each subclass (see commit 0e2aeaf)
+    - It was duplicating the insurance type's logic using self.policies and self.deaths
+    - So I replaced everything with premiums and claims, to reuse logic
+'''
 class _Template:
     def __init__(self, config):
-        super().__init__(config)
         self.round = False
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
         future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
@@ -210,19 +218,20 @@ class _Template:
         - When calculating expected values at a given year, future returns must be discounted
         - But using discount column means all expected returns are calculated with present at year 0
         - To make every expected return with present at year n, divide it by discount column
+            - Originally I did it inside "calculate expected reserves one year", but vector function is more efficient
         - Divide by number of policies so every expected return is for 1 policy holder
         '''
         self.discount = (1+self.config.mean_interest) ** -self.output_df.index
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) / self.discount / self.output_df.policies
 class InsuranceTemplate(Insurance, _Template):
-    def __init__(self, config):
-        super().__init__(config)
-        self.round = True
-class AnnuityTemplate(Annuity, _Template):
     pass
-class AnnuityIncrementTemplate(AnnuityIncrement, _Template):
+class EndowmentTemplate(_Template, Endowment):
     pass
-class InvestmentTemplate(Investment, _Template): # Not being used
+class AnnuityTemplate(_Template, Annuity):
     pass
-class MultipleTemplate(Multiple, _Template):
+class AnnuityIncrementTemplate(_Template, AnnuityIncrement):
+    pass
+class InvestmentTemplate(_Template, Investment): # Not being used
+    pass
+class MultipleTemplate(_Template, Multiple):
     pass
