@@ -205,6 +205,7 @@ class MultipleDeduct(Multiple, InsuranceDeduct):
 '''
 class _Template:
     def __init__(self, config):
+        super().__init__(config)
         self.round = False
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
         future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
