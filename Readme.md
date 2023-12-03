@@ -39,7 +39,7 @@
     - Main.process_df
 - monte_carlo
     - _set_simulation_variables
-        - Handler.make_template
+        - Template.make_template
     - _run_simulations
         - Main.calculate_actual_reserves
         - _calculate_positive
