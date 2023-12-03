@@ -213,9 +213,11 @@ class _Template:
         self._calculate_premiums()
         '''
         - When calculating expected values at a given year, future returns must be discounted
-        - But using discount column means all expected returns are calculated with present at year 0
-        - To make every expected return with present at year n, divide it by discount column
-            - Originally I did it inside "calculate expected reserves one year", but vector function is more efficient
+            - But using 1 discount column means all expected returns use year 0 as present
+            - To use year n as present, divide expected return column by discount column
+        - Originally, discount, discounted cashflows, and divide by discount were all in "calculate expected reserves one year"
+            - I moved them to main function because they only need to be calculated once
+            - And vector operation is more efficient
         - Divide by number of policies so every expected return is for 1 policy holder
         '''
         self.discount = (1+self.config.mean_interest) ** -self.output_df.index

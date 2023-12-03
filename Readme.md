@@ -11,6 +11,7 @@
     - Tester.py: run simulations with insurance policies, and check if success rate matches answer
         - Main.py: contains different insurance policies
 - Config.py: contains settings for the program, accessible by all modules
+- Template.py: builds template from class, used by Handler and Tester
 
 # Notebook
 - I've created notebook.ipynb to make it more convenient to:
@@ -22,14 +23,14 @@
 
 ## Class Tree
 - Tester: count % of simulations with end reserves > 0
-    - Insurance: Config.set_insurance, Main.Insurance(Intrest, Deduct, Add)
+    - Insurance: Config.set_insurance, Main.Insurance(Interest, Deduct, Add)
         - InsuranceYear20: % of simulations with year 20 reserves > 0, Main.InsuraceExpected
         - InsuranceYearCount: % of years with actual > expected, Main.InsuraceExpected
     - Endowment: Config.set_insurance, Main.Endowment
     - Annuity: Config.set_annuity, Main.Annuity(Deduct)
     - Investment: Config.set_investment, Main.Investment
     - Multiple: Config.set_multiple, Main.Multiple(Deduct)
-    - Each class calls monte_carlo() with different premiums for different questions
+- Each class calls monte_carlo() with different premiums for different questions
 
 ## Function Tree
 - __init__
@@ -48,7 +49,7 @@
 # Main.py
 
 ## Class Tree
-- Insurance: claims use deaths, premiums in all years
+- Insurance: claims use deaths, premiums in all years, round
     - InsuranceInterest: recalculate interest when calculating actual reserves
     - InsuranceExpected: expected = template.expected * policies
         - InsuranceDeduct: deduct when higher than expected * 1.5 from year 1 to 30
@@ -56,6 +57,7 @@
     - Endowment: 30 year policy, everyone dies at year 29
     - Annuity: claims use policies, premiums in year 0 only, adjustable start age
         - AnnuityDeduct: InsuranceDeduct, expected * 1.211 from year 1 to 20
+        - AnnuityIncrement: claim amount increases every year
     - _Cut Years: use self.input_df2, 25 year policy, last year is claim only
         - Investment: claim at end, no deaths
         - Multiple: death claim is years * premium, survival claim in last year
