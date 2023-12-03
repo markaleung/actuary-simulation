@@ -226,7 +226,7 @@ class _Template:
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) / self.discount / self.output_df.policies
 class InsuranceTemplate(Insurance, _Template):
     pass
-class EndowmentTemplate(_Template, Endowment):
+class EndowmentTemplate(Endowment, _Template):
     pass
 class AnnuityTemplate(_Template, Annuity):
     pass
