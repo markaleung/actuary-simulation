@@ -60,13 +60,13 @@
         - Investment: claim at end, no deaths
         - Multiple: death claim is years * premium, survival claim in last year
             - MultipleDeduct: InsuranceDeduct, expected * 1.2 from year 5 to 18
-- _Template: calculate expected reserves for others to use
-    - InsuranceTemplate: Insurance, expected reserves
-        - EndowmentTemplate: Endowment
-    - AnnuityTemplate: Annuity, expected reserves, don't round
-        - AnnuityIncrementTemplate: AnnuityIncrement
-    - InvestmentTemplate: Investment, expected reserves, don't round
-    - MultipleTemplate: Multiple, expected reserves, don't round
+- _Template: calculate expected reserves for others to use, don't round
+    - InsuranceTemplate: Insurance, round
+    - EndowmentTemplate: Endowment, round
+    - AnnuityTemplate: Annuity
+    - AnnuityIncrementTemplate: AnnuityIncrement
+    - InvestmentTemplate: Investment
+    - MultipleTemplate: Multiple
 
 ## Function Tree
 - __init__

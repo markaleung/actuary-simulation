@@ -197,7 +197,7 @@ class MultipleDeduct(Multiple, InsuranceDeduct):
 '''
 - Subclasses must inherit _Template first, 
     - So that init uses self.round = False (from _Template) instead of self.round = True (from other classes)
-    - Except InsuranceTemplate, which uses self.round = True
+    - Except InsuranceTemplate and EndowmentTemplate, which use self.round = True
     - This is following the class's logic
 - Originally I had custom logic for each subclass (see commit 0e2aeaf)
     - It was duplicating the insurance type's logic using self.policies and self.deaths
@@ -208,11 +208,7 @@ class _Template:
         super().__init__(config)
         self.round = False
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
-        # Claims are based on previous year's deaths
-        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
-        expected_reserves = future_claims - future_premiums
-        return expected_reserves
+        return self.discounted_cashflows[year+1:].sum()
     def calculate_expected_reserves(self):
         self._calculate_premiums()
         '''
@@ -223,6 +219,7 @@ class _Template:
         - Divide by number of policies so every expected return is for 1 policy holder
         '''
         self.discount = (1+self.config.mean_interest) ** -self.output_df.index
+        self.discounted_cashflows = (self.output_df.claims - self.output_df.premiums) * self.discount
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) / self.discount / self.output_df.policies
 class InsuranceTemplate(Insurance, _Template):
     pass
