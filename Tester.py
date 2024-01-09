@@ -68,6 +68,11 @@ class Insurance(Tester):
         self.monte_carlo(premium = 2265.98, answer = 0.455)
         self.monte_carlo(premium = 2000, answer = 0.36)
         self.monte_carlo(premium = 2500, answer = 0.615)
+    def main(self):
+        self.aq66_pq63()
+        self.aq67()
+        self.pq73()
+        self.aq73()
 class InsuranceYear20(Insurance):
     def _calculate_positive(self, simulation: Main.Insurance) -> float:
         actual_higher_than_expected = simulation.output_df.actual_reserves[20] > simulation.output_df.expected_reserves[20]
@@ -75,6 +80,8 @@ class InsuranceYear20(Insurance):
     def pq72(self):
         self.make_simulations(insurance_class = Main.InsuranceExpected)
         self.monte_carlo(premium = 2265.98, answer = 0.39)
+    def main(self):
+        self.pq72()
 class InsuranceYearCount(Insurance):
     def _calculate_positive(self, simulation: Main.Insurance) -> float:
         actual_higher_than_expected = simulation.output_df.actual_reserves[1:-1] > simulation.output_df.expected_reserves[1:-1]
@@ -82,6 +89,8 @@ class InsuranceYearCount(Insurance):
     def aq72(self):
         self.make_simulations(insurance_class = Main.InsuranceExpected)
         self.monte_carlo(premium = 2265.98, answer = 0.438)
+    def main(self):
+        self.aq72()
 class Endowment(Tester):
     def __init__(self, config):
         super().__init__(config)
@@ -89,6 +98,8 @@ class Endowment(Tester):
     def aq68(self):
         self.make_simulations(insurance_class = Main.Endowment)
         self.monte_carlo(premium = 7725, answer = 0.9)
+    def main(self):
+        self.aq68()
 class Annuity(Tester):
     def __init__(self, config):
         super().__init__(config)
@@ -113,6 +124,10 @@ class Annuity(Tester):
         self.config.annuity_start_age = 60
         self.make_simulations(insurance_class = Main.AnnuityDeduct)
         self.monte_carlo(premium = 450000, answer = 0.95)
+    def main(self):
+        self.pq74_aq75()
+        self.aq74()
+        self.aq75()
 class Investment(Tester):
     def __init__(self, config):
         super().__init__(config)
@@ -120,6 +135,8 @@ class Investment(Tester):
     def fe5(self):
         self.make_simulations(insurance_class = Main.Investment)
         self.monte_carlo(premium = 5000, answer = 0.13)
+    def main(self):
+        self.fe5()
 class Multiple(Tester):
     def __init__(self, config):
         super().__init__(config)
@@ -132,3 +149,8 @@ class Multiple(Tester):
         self.template_class = Main.MultipleTemplate
         self.make_simulations(insurance_class = Main.MultipleDeduct)
         self.monte_carlo(premium = 7500, answer = 0.55)
+    def main(self):
+        self.fe12_fe14()
+        self.fe16()
+
+CLASSES = {name: eval(name) for name in ['Insurance', 'InsuranceYear20', 'InsuranceYearCount', 'Endowment', 'Annuity', 'Investment', 'Multiple']}
