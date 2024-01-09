@@ -2,6 +2,7 @@ import tqdm, Main, Config, Template
 
 class Tester():
     def __init__(self):
+        self.config = config
         self.template_maker = Template.TemplateMaker(config)
         self.template_class = None
     def make_simulations(self, insurance_class):
@@ -36,7 +37,7 @@ class Tester():
 class Insurance(Tester):
     def __init__(self):
         super().__init__()
-        config.set_insurance()
+        self.config.set_insurance()
         # Needed for pq73, aq73, pq72, aq72
         self.template_class = Main.InsuranceTemplate
     def aq66_pq63(self):
@@ -93,7 +94,7 @@ class InsuranceYearCount(Insurance):
 class Endowment(Tester):
     def __init__(self):
         super().__init__()
-        config.set_insurance()
+        self.config.set_insurance()
     def aq68(self):
         self.make_simulations(insurance_class = Main.Endowment)
         self.monte_carlo(premium = 7725, answer = 0.9)
@@ -102,7 +103,7 @@ class Endowment(Tester):
 class Annuity(Tester):
     def __init__(self):
         super().__init__()
-        config.set_annuity()
+        self.config.set_annuity()
     def pq74_aq75(self):
         config.annuity_start_age = 60
         self.make_simulations(insurance_class = Main.Annuity)
@@ -130,7 +131,7 @@ class Annuity(Tester):
 class Investment(Tester):
     def __init__(self):
         super().__init__()
-        config.set_investment()
+        self.config.set_investment()
     def fe5(self):
         self.make_simulations(insurance_class = Main.Investment)
         self.monte_carlo(premium = 5000, answer = 0.13)
@@ -139,7 +140,7 @@ class Investment(Tester):
 class Multiple(Tester):
     def __init__(self):
         super().__init__()
-        config.set_multiple()
+        self.config.set_multiple()
     def fe12_fe14(self):
         self.make_simulations(insurance_class = Main.Multiple)
         self.monte_carlo(premium = 7500, answer = 0.67)
