@@ -45,7 +45,8 @@ class Insurance():
     def _make_output_df(self):
         self.output_df = pd.DataFrame(self.output_df)
     def _calculate_claims(self):
-        self.output_df['claims'] = 0
+        # Must be float, because next line is float
+        self.output_df['claims'] = 0.0
         # Claims pay based on last year's deaths
         self.output_df.loc[1:, 'claims'] = list(self.output_df.deaths[:-1] * self.config.claim)
     def _calculate_interest(self):
@@ -135,8 +136,9 @@ class Annuity(Insurance):
         # Claims are paid to alive, not dead
         self.output_df['claims'] = self.output_df.policies * self.config.claim
     def _calculate_premiums(self):
+        # Must be float, because next line is float
+        self.output_df['premiums'] = 0.0
         # Annuities only have 1 premium at year 0
-        self.output_df['premiums'] = 0
         self.output_df.loc[0, 'premiums'] = self.output_df.policies[0] * self.config.premium
 class AnnuityDeduct(Annuity, InsuranceDeduct):
     def __init__(self, config):
@@ -177,7 +179,8 @@ class Investment(_CutYears):
         self._calculate_interest()
 class Multiple(_CutYears):
     def _calculate_claims(self):
-        self.output_df['claims'] = 0
+        # Must be float, because next line is float
+        self.output_df['claims'] = 0.0
         # Death claims = premiums paid
         self.output_df.loc[1:, 'claims'] = list(self.output_df.deaths[:-1] * self.input_df.year[1:].reset_index(drop=True) * self.config.premium)
         # Survival claim for people alive at the end

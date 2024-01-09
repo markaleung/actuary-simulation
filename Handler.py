@@ -1,16 +1,5 @@
 import Main, Tester, Config, Template, os
 
-'''Module Tree
-Handler
-    Config
-    Tester
-        Config
-        Main
-            Config
-    Main
-        Config
-'''
-
 def test_annuity_yield():
     config.set_annuity()
     config.annuity_start_age = 65
