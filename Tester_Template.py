@@ -39,7 +39,7 @@ class Investment(Tester):
         super().__init__()
         self.config.set_investment()
         self.template_class = Main.InvestmentTemplate
-        self.assertions = [[0, 17544]]
+        self.assertion_data = [[0, 17544]]
 
 class Multiple(Tester):
     def __init__(self):

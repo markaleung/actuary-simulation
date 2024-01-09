@@ -2,7 +2,7 @@ import tqdm, Main, Config, Template
 
 class Tester():
     def __init__(self):
-        self.config = config
+        self.config = config_global
         self.template_maker = Template.TemplateMaker(self.config)
         self.template_class = None
     def make_simulations(self, insurance_class):
@@ -154,5 +154,5 @@ class Multiple(Tester):
         self.fe16()
 
 CLASSES = {name: eval(name) for name in ['Insurance', 'InsuranceYear20', 'InsuranceYearCount', 'Endowment', 'Annuity', 'Investment', 'Multiple']}
-config = Config.Config(True)
-config.set_dfs(random_condition = 'random_saved')
+config_global = Config.Config(True)
+config_global.set_dfs(random_condition = 'random_saved')

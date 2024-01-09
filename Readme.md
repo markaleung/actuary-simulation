@@ -6,21 +6,28 @@
     - It got very difficult to keep track of changes in different files
 - In contrast, Python can use parent classes to write shared logic only once
 
+# How to install the repository
+- Clone it to your computer
+- Install python 3.9
+- Type `pip install -r requirements.txt`
+
+# How to run the repository
+- Everything can be run from notebook.ipynb
+    - Call Main.py with different settings
+    - Call Tester.py with different settings
+    - Call Tester.py to run all simulation tests
+    - Call Tester_Template.py to run all template tests
+    - Call Tester_Annuity.py to test annuities
+
 # Module Structure
-- Tester files
+- Tester files run the insurance policies and make sure their values match those from the class
     - Tester.py: run simulations with insurance policies, and check if success rate matches answer
-    - Tester_Template: tests insurance templates
-    - Tester_Annuity: tests effect of interest rates on regular and increment annuities
+    - Tester_Template: test insurance templates
+    - Tester_Annuity: test effect of interest rates on regular and increment annuities
     - Each use the following classes
         - Main.py: contains different insurance policies
         - Config.py: contains settings for the program, accessible by all modules
         - Template.py: builds template from class, used by Handler and Tester
-
-# Notebook
-- I've created notebook.ipynb to make it more convenient to:
-    - Call Main.py with different settings
-    - Call Tester.py with different settings
-    - Call Handler.py to run all tests
 
 # Tester.py
 
@@ -37,7 +44,7 @@
 
 ## Function Tree
 - __init__
-    - Config.set_<something>
+    - Config.set_something
 - make_simulations
     - Main.__init__
     - Main.process_df
@@ -60,7 +67,7 @@
 
 ## Function Tree
 - __init__
-    - config.set_insurance
+    - config.set_something
 - main
     - _make_template
         - template_maker.make_template
