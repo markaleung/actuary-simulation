@@ -3,6 +3,7 @@ import tqdm, Main, Config, typing, Template
 class Tester():
     def __init__(self, config: Config.Config):
         self.config = config
+        assert self.config.simulate == True
         self.template_maker = Template.TemplateMaker(self.config)
         self.template_class = None
     def make_simulations(self, insurance_class):

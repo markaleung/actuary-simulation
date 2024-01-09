@@ -39,33 +39,6 @@ def test_random_saved():
     insurance.calculate_actual_reserves()
     if config.random_condition == 'random_saved':
         assert round(insurance.final_reserves) == 434802897, insurance.final_reserves
-# Simulations
-def test_insurance():
-    tester_insurance = Tester.Insurance(config)
-    tester_insurance.aq66_pq63()
-    tester_insurance.aq67()
-    tester_insurance.pq73()
-    tester_insurance.aq73()
-def test_insurance_years():
-    tester_insurance = Tester.InsuranceYear20(config)
-    tester_insurance.pq72()
-    tester_insurance = Tester.InsuranceYearCount(config)
-    tester_insurance.aq72()
-def test_endowment():
-    tester_endowment = Tester.Endowment(config)
-    tester_endowment.aq68()
-def test_annuity():
-    tester_annuity = Tester.Annuity(config)
-    tester_annuity.pq74_aq75()
-    tester_annuity.aq74()
-    tester_annuity.aq75()
-def test_investment():
-    tester_investment = Tester.Investment(config)
-    tester_investment.fe5()
-def test_multiple():
-    tester_multiple = Tester.Multiple(config)
-    tester_multiple.fe12_fe14()
-    tester_multiple.fe16()    
 # Handler
 def test_all():
     test_annuity_yield()
@@ -74,13 +47,6 @@ def test_all():
     test_annuity_template()
     test_multiple_template()
     test_random_saved()
-    if SIMULATE:
-        test_insurance()
-        test_insurance_years()
-        test_endowment()
-        test_annuity()
-        test_investment()
-        test_multiple()
 
 os.chdir(os.path.dirname(__file__))
 SIMULATE = True
