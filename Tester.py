@@ -1,17 +1,15 @@
-import tqdm, Main, Config, typing, Template
+import tqdm, Main, Config, Template
 
 class Tester():
-    def __init__(self, config: Config.Config):
-        self.config = config
-        assert self.config.simulate == True
-        self.template_maker = Template.TemplateMaker(self.config)
+    def __init__(self):
+        self.template_maker = Template.TemplateMaker(config)
         self.template_class = None
     def make_simulations(self, insurance_class):
         self.simulations = []
-        for i in tqdm.trange(self.config.total_simulations):
-            simulation = insurance_class(config = self.config)
-            simulation.input_df.rand_deaths = self.config.rand_deaths[i]
-            simulation.input_df.rand_interest = self.config.rand_int[i]
+        for i in tqdm.trange(config.total_simulations):
+            simulation = insurance_class(config = config)
+            simulation.input_df.rand_deaths = config.rand_deaths[i]
+            simulation.input_df.rand_interest = config.rand_int[i]
             simulation.process_df()
             self.simulations.append(simulation)
     def _set_simulation_variables(self):
@@ -25,20 +23,20 @@ class Tester():
             simulation.calculate_actual_reserves(template = self.template)
             self.positive_count += self._calculate_positive(simulation = simulation)
     def _check_simulation_results(self, answer: float):
-        positive_ratio = self.positive_count/self.config.total_simulations
+        positive_ratio = self.positive_count/config.total_simulations
         positive_ratio = round(positive_ratio, 3)
         print(positive_ratio, answer)
-        if self.config.random_condition == 'random_saved' and answer is not None:
+        if config.random_condition == 'random_saved' and answer is not None:
             assert positive_ratio == answer, positive_ratio
     def monte_carlo(self, premium: float, answer: float):
-        self.config.premium = premium
+        config.premium = premium
         self._set_simulation_variables()
         self._run_simulations()
         self._check_simulation_results(answer = answer)
 class Insurance(Tester):
-    def __init__(self, config):
-        super().__init__(config)
-        self.config.set_insurance()
+    def __init__(self):
+        super().__init__()
+        config.set_insurance()
         # Needed for pq73, aq73, pq72, aq72
         self.template_class = Main.InsuranceTemplate
     def aq66_pq63(self):
@@ -49,16 +47,16 @@ class Insurance(Tester):
         self.monte_carlo(premium = 3285, answer = 0.9) # pq 6.3
     def aq67(self):
         self.make_simulations(insurance_class = Main.InsuranceInterest)
-        self.config.mean_interest = 0.031
-        self.config.sd_interest = 2.5 * 0.001
+        config.mean_interest = 0.031
+        config.sd_interest = 2.5 * 0.001
         self.monte_carlo(premium = 4375, answer = 0.9)
-        self.config.mean_interest = 0.07
-        self.config.sd_interest = 2.5 * 0.04
+        config.mean_interest = 0.07
+        config.sd_interest = 2.5 * 0.04
         self.monte_carlo(premium = 3050, answer = 0.9)
-        self.config.mean_interest = 0.17
-        self.config.sd_interest = 2.5 * 0.14
+        config.mean_interest = 0.17
+        config.sd_interest = 2.5 * 0.14
         self.monte_carlo(premium = 3975, answer = 0.9)
-        self.config.set_insurance() # Reset mean_interest, sd_interest
+        config.set_insurance() # Reset mean_interest, sd_interest
     def pq73(self):
         self.make_simulations(insurance_class = Main.InsuranceDeduct)
         self.monte_carlo(premium = 2265.98, answer = 0.41)
@@ -93,20 +91,20 @@ class InsuranceYearCount(Insurance):
     def main(self):
         self.aq72()
 class Endowment(Tester):
-    def __init__(self, config):
-        super().__init__(config)
-        self.config.set_insurance()
+    def __init__(self):
+        super().__init__()
+        config.set_insurance()
     def aq68(self):
         self.make_simulations(insurance_class = Main.Endowment)
         self.monte_carlo(premium = 7725, answer = 0.9)
     def main(self):
         self.aq68()
 class Annuity(Tester):
-    def __init__(self, config):
-        super().__init__(config)
-        self.config.set_annuity()
+    def __init__(self):
+        super().__init__()
+        config.set_annuity()
     def pq74_aq75(self):
-        self.config.annuity_start_age = 60
+        config.annuity_start_age = 60
         self.make_simulations(insurance_class = Main.Annuity)
         premium = 390889.81
         self.monte_carlo(premium = premium * 1.0, answer = 0.47)
@@ -114,7 +112,7 @@ class Annuity(Tester):
         self.monte_carlo(premium = premium * 1.1, answer = 0.87)
         self.monte_carlo(premium = 450000, answer = 0.975) # aq7.5
     def aq74(self):
-        self.config.annuity_start_age = 80
+        config.annuity_start_age = 80
         self.make_simulations(insurance_class = Main.Annuity)
         premium = 196939.02
         self.monte_carlo(premium = premium * 1.0, answer = 0.52)
@@ -122,7 +120,7 @@ class Annuity(Tester):
         self.monte_carlo(premium = premium * 1.1, answer = 0.955)
     def aq75(self):
         self.template_class = Main.AnnuityTemplate
-        self.config.annuity_start_age = 60
+        config.annuity_start_age = 60
         self.make_simulations(insurance_class = Main.AnnuityDeduct)
         self.monte_carlo(premium = 450000, answer = 0.95)
     def main(self):
@@ -130,18 +128,18 @@ class Annuity(Tester):
         self.aq74()
         self.aq75()
 class Investment(Tester):
-    def __init__(self, config):
-        super().__init__(config)
-        self.config.set_investment()
+    def __init__(self):
+        super().__init__()
+        config.set_investment()
     def fe5(self):
         self.make_simulations(insurance_class = Main.Investment)
         self.monte_carlo(premium = 5000, answer = 0.13)
     def main(self):
         self.fe5()
 class Multiple(Tester):
-    def __init__(self, config):
-        super().__init__(config)
-        self.config.set_multiple()
+    def __init__(self):
+        super().__init__()
+        config.set_multiple()
     def fe12_fe14(self):
         self.make_simulations(insurance_class = Main.Multiple)
         self.monte_carlo(premium = 7500, answer = 0.67)
@@ -155,3 +153,5 @@ class Multiple(Tester):
         self.fe16()
 
 CLASSES = {name: eval(name) for name in ['Insurance', 'InsuranceYear20', 'InsuranceYearCount', 'Endowment', 'Annuity', 'Investment', 'Multiple']}
+config = Config.Config(True)
+config.set_dfs(random_condition = 'random_saved')
