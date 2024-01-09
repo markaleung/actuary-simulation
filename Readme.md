@@ -7,11 +7,14 @@
 - In contrast, Python can use parent classes to write shared logic only once
 
 # Module Structure
-- Handler.py: calls all the functions in Tester.py
+- Tester files
     - Tester.py: run simulations with insurance policies, and check if success rate matches answer
+    - Tester_Template: tests insurance templates
+    - Tester_Annuity: tests effect of interest rates on regular and increment annuities
+    - Each use the following classes
         - Main.py: contains different insurance policies
-- Config.py: contains settings for the program, accessible by all modules
-- Template.py: builds template from class, used by Handler and Tester
+        - Config.py: contains settings for the program, accessible by all modules
+        - Template.py: builds template from class, used by Handler and Tester
 
 # Notebook
 - I've created notebook.ipynb to make it more convenient to:
@@ -45,6 +48,35 @@
         - Main.calculate_actual_reserves
         - _calculate_positive
     - _check_simulation_results
+
+# Tester_Template.py
+
+## Class Tree
+- Each child class defines config settings/template class for the type of insurance, and assertion data (defined by class)
+    - Insurance
+    - Annuity
+    - Investment
+    - Multiple
+
+## Function Tree
+- __init__
+    - config.set_insurance
+- main
+    - _make_template
+        - template_maker.make_template
+    - for row_number, answer in assertion_data
+        - _assert_value
+
+# Tester_Annuity.py
+
+## Function Tree
+- _make_templates
+    - for interest in interests:
+        - for template_class in template_classes
+            - make_template
+                - Single.main
+                    - template_maker.make_template
+- make_dataframe
 
 # Main.py
 
