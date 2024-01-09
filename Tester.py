@@ -3,7 +3,7 @@ import tqdm, Main, Config, Template
 class Tester():
     def __init__(self):
         self.config = config
-        self.template_maker = Template.TemplateMaker(config)
+        self.template_maker = Template.TemplateMaker(self.config)
         self.template_class = None
     def make_simulations(self, insurance_class):
         self.simulations = []
