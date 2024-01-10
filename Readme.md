@@ -6,34 +6,45 @@
     - It got very difficult to keep track of changes in different files
 - In contrast, Python can use parent classes to write shared logic only once
 
-# Module Structure
-- Handler.py: calls all the functions in Tester.py
-    - Tester.py: run simulations with insurance policies, and check if success rate matches answer
-        - Main.py: contains different insurance policies
-- Config.py: contains settings for the program, accessible by all modules
+# How to install the repository
+- Clone it to your computer
+- Install python 3.9
+- Type `pip install -r requirements.txt`
 
-# Notebook
-- I've created notebook.ipynb to make it more convenient to:
+# How to run the repository
+- Everything can be run from notebook.ipynb
     - Call Main.py with different settings
     - Call Tester.py with different settings
-    - Call Handler.py to run all tests
+    - Call Tester.py to run all simulation tests
+    - Call Tester_Template.py to run all template tests
+    - Call Tester_Annuity.py to test annuities
+
+# Module Structure
+- Tester files run the insurance policies and make sure their values match those from the class
+    - Tester.py: run simulations with insurance policies, and check if success rate matches answer
+    - Tester_Template: test insurance templates
+    - Tester_Annuity: test effect of interest rates on regular and increment annuities
+    - Each use the following classes
+        - Main.py: contains different insurance policies
+        - Config.py: contains settings for the program, accessible by all modules
+        - Template.py: builds template from class, used by Handler and Tester
 
 # Tester.py
 
 ## Class Tree
 - Tester: count % of simulations with end reserves > 0
-    - Insurance: Config.set_insurance, Main.Insurance(Intrest, Deduct, Add)
+    - Insurance: Config.set_insurance, Main.Insurance(Interest, Deduct, Add)
         - InsuranceYear20: % of simulations with year 20 reserves > 0, Main.InsuraceExpected
         - InsuranceYearCount: % of years with actual > expected, Main.InsuraceExpected
     - Endowment: Config.set_insurance, Main.Endowment
     - Annuity: Config.set_annuity, Main.Annuity(Deduct)
     - Investment: Config.set_investment, Main.Investment
     - Multiple: Config.set_multiple, Main.Multiple(Deduct)
-    - Each class calls monte_carlo() with different premiums for different questions
+- Each class calls monte_carlo() with different premiums for different questions
 
 ## Function Tree
 - __init__
-    - Config.set_<something>
+    - Config.set_something
 - make_simulations
     - Main.__init__
     - Main.process_df
@@ -45,10 +56,39 @@
         - _calculate_positive
     - _check_simulation_results
 
+# Tester_Template.py
+
+## Class Tree
+- Each child class defines config settings/template class for the type of insurance, and assertion data (defined by class)
+    - Insurance
+    - Annuity
+    - Investment
+    - Multiple
+
+## Function Tree
+- __init__
+    - config.set_something
+- main
+    - _make_template
+        - template_maker.make_template
+    - for row_number, answer in assertion_data
+        - _assert_value
+
+# Tester_Annuity.py
+
+## Function Tree
+- _make_templates
+    - for interest in interests:
+        - for template_class in template_classes
+            - make_template
+                - Single.main
+                    - template_maker.make_template
+- make_dataframe
+
 # Main.py
 
 ## Class Tree
-- Insurance: claims use deaths, premiums in all years
+- Insurance: claims use deaths, premiums in all years, round
     - InsuranceInterest: recalculate interest when calculating actual reserves
     - InsuranceExpected: expected = template.expected * policies
         - InsuranceDeduct: deduct when higher than expected * 1.5 from year 1 to 30
@@ -56,17 +96,18 @@
     - Endowment: 30 year policy, everyone dies at year 29
     - Annuity: claims use policies, premiums in year 0 only, adjustable start age
         - AnnuityDeduct: InsuranceDeduct, expected * 1.211 from year 1 to 20
+        - AnnuityIncrement: claim amount increases every year
     - _Cut Years: use self.input_df2, 25 year policy, last year is claim only
         - Investment: claim at end, no deaths
         - Multiple: death claim is years * premium, survival claim in last year
             - MultipleDeduct: InsuranceDeduct, expected * 1.2 from year 5 to 18
-- _Template: calculate expected reserves for others to use
-    - InsuranceTemplate: Insurance, expected reserves
-        - EndowmentTemplate: Endowment
-    - AnnuityTemplate: Annuity, expected reserves, don't round
-        - AnnuityIncrementTemplate: AnnuityIncrement
-    - InvestmentTemplate: Investment, expected reserves, don't round
-    - MultipleTemplate: Multiple, expected reserves, don't round
+- _Template: calculate expected reserves for others to use, don't round
+    - InsuranceTemplate: Insurance, round
+    - EndowmentTemplate: Endowment, round
+    - AnnuityTemplate: Annuity
+    - AnnuityIncrementTemplate: AnnuityIncrement
+    - InvestmentTemplate: Investment
+    - MultipleTemplate: Multiple
 
 ## Function Tree
 - __init__

@@ -31,7 +31,7 @@ class Config():
         assert df.min().min() >= 0
         assert df.max().max() <= 1
         timey = time.time()
-        normal_df = df.applymap(self._norm_ppf)
+        normal_df = df.map(self._norm_ppf)
         print(time.time() - timey)
         return normal_df
     def set_dfs(self, random_condition: str):

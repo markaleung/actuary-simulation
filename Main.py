@@ -45,7 +45,8 @@ class Insurance():
     def _make_output_df(self):
         self.output_df = pd.DataFrame(self.output_df)
     def _calculate_claims(self):
-        self.output_df['claims'] = 0
+        # Must be float, because next line is float
+        self.output_df['claims'] = 0.0
         # Claims pay based on last year's deaths
         self.output_df.loc[1:, 'claims'] = list(self.output_df.deaths[:-1] * self.config.claim)
     def _calculate_interest(self):
@@ -135,8 +136,9 @@ class Annuity(Insurance):
         # Claims are paid to alive, not dead
         self.output_df['claims'] = self.output_df.policies * self.config.claim
     def _calculate_premiums(self):
+        # Must be float, because next line is float
+        self.output_df['premiums'] = 0.0
         # Annuities only have 1 premium at year 0
-        self.output_df['premiums'] = 0
         self.output_df.loc[0, 'premiums'] = self.output_df.policies[0] * self.config.premium
 class AnnuityDeduct(Annuity, InsuranceDeduct):
     def __init__(self, config):
@@ -177,7 +179,8 @@ class Investment(_CutYears):
         self._calculate_interest()
 class Multiple(_CutYears):
     def _calculate_claims(self):
-        self.output_df['claims'] = 0
+        # Must be float, because next line is float
+        self.output_df['claims'] = 0.0
         # Death claims = premiums paid
         self.output_df.loc[1:, 'claims'] = list(self.output_df.deaths[:-1] * self.input_df.year[1:].reset_index(drop=True) * self.config.premium)
         # Survival claim for people alive at the end
@@ -197,7 +200,7 @@ class MultipleDeduct(Multiple, InsuranceDeduct):
 '''
 - Subclasses must inherit _Template first, 
     - So that init uses self.round = False (from _Template) instead of self.round = True (from other classes)
-    - Except InsuranceTemplate, which uses self.round = True
+    - Except InsuranceTemplate and EndowmentTemplate, which use self.round = True
     - This is following the class's logic
 - Originally I had custom logic for each subclass (see commit 0e2aeaf)
     - It was duplicating the insurance type's logic using self.policies and self.deaths
@@ -208,21 +211,20 @@ class _Template:
         super().__init__(config)
         self.round = False
     def _calculate_expected_reserves_one_year(self, year: int) -> float:
-        future_premiums = (self.output_df.premiums[year+1:] * self.discount[year+1:]).sum()
-        # Claims are based on previous year's deaths
-        future_claims = (self.output_df.claims[year+1:] * self.discount[year+1:]).sum()
-        expected_reserves = future_claims - future_premiums
-        return expected_reserves
+        return self.discounted_cashflows[year+1:].sum()
     def calculate_expected_reserves(self):
         self._calculate_premiums()
         '''
         - When calculating expected values at a given year, future returns must be discounted
-        - But using discount column means all expected returns are calculated with present at year 0
-        - To make every expected return with present at year n, divide it by discount column
-            - Originally I did it inside "calculate expected reserves one year", but vector function is more efficient
+            - But using 1 discount column means all expected returns use year 0 as present
+            - To use year n as present, divide expected return column by discount column
+        - Originally, discount, discounted cashflows, and divide by discount were all in "calculate expected reserves one year"
+            - I moved them to main function because they only need to be calculated once
+            - And vector operation is more efficient
         - Divide by number of policies so every expected return is for 1 policy holder
         '''
         self.discount = (1+self.config.mean_interest) ** -self.output_df.index
+        self.discounted_cashflows = (self.output_df.claims - self.output_df.premiums) * self.discount
         self.output_df['expected_reserves'] = self.output_df.index.map(self._calculate_expected_reserves_one_year) / self.discount / self.output_df.policies
 class InsuranceTemplate(Insurance, _Template):
     pass
