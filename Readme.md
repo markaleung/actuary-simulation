@@ -34,8 +34,8 @@
 ## Class Tree
 - Tester: count % of simulations with end reserves > 0
     - Insurance: Config.set_insurance, Main.Insurance(Interest, Deduct, Add)
-        - InsuranceYear20: % of simulations with year 20 reserves > 0, Main.InsuraceExpected
-        - InsuranceYearCount: % of years with actual > expected, Main.InsuraceExpected
+        - InsuranceYear20: % of simulations with year 20 reserves > 0, Main.InsuranceExpected
+        - InsuranceYearCount: % of years with actual > expected, Main.InsuranceExpected
     - Endowment: Config.set_insurance, Main.Endowment
     - Annuity: Config.set_annuity, Main.Annuity(Deduct)
     - Investment: Config.set_investment, Main.Investment
@@ -45,16 +45,18 @@
 ## Function Tree
 - __init__
     - Config.set_something
-- make_simulations
-    - Main.__init__
-    - Main.process_df
+- make_simulations # Calculate once for all simulations, to save time, because it doesn't depend on premiums
+    - for i in tqdm.trange(self.config.total_simulations):
+        - Main.__init__
+        - Main.process_df
 - monte_carlo
-    - _set_simulation_variables
-        - Template.make_template
+    - _set_simulation_variables # Reset positive count
+        - Template.make_template # Need to rebuild template to use new premium
     - _run_simulations
-        - Main.calculate_actual_reserves
-        - _calculate_positive
-    - _check_simulation_results
+        - for simulation in self.simulations:
+            - Main.calculate_actual_reserves # Must be recalculated when premium changes
+            - _calculate_positive # Reserves > 0
+    - _check_simulation_results # Only assert for random saved, so random numbers don't change
 
 # Tester_Template.py
 
@@ -114,22 +116,22 @@
     - _load_transform_df
     - _check_assertions
 - process_df
-    - _make_start_values
+    - _make_start_values # policies, deaths, dataframe
     - for each row in self.input_df
-        - _update_deaths (Except Investment)
+        - _update_deaths # Except Investment
             - _make_random_variable
         - _append_row_to_output
-        - _update_policies (Except Investment)
+        - _update_policies # Except Investment
     - _make_output_df
     - _calculate_claims
     - _calculate_interest
         - _make_random_variable
 - calculate_actual_reserves
-    - _calculate_interest (Only InsuranceInterest)
-    - _calculate_claims (Only Multiple)
-    - _calculate_premiums
-    - _adjust_reserves
-- calculate_expected_reserves (Only Template)
+    - _calculate_interest # Only InsuranceInterest
+    - _calculate_claims # Only Multiple
+    - _calculate_premiums # Often changes, so calculated with reserves
+    - _adjust_reserves # Only Deduct and Add
+- calculate_expected_reserves # Only Template
     - _calculate_expected_reserves_one_year
 
 # Config.py
@@ -146,10 +148,10 @@
 ## Function Tree
 - __init__
 - set_dfs
-    - _read_random
+    - _read_random # Random numbers for simulations
         - _read_df
         - _norm_ppf
-    - _read_input
+    - _read_input # Input also has random numbers, but can be replaced by random numbers
         - _read_df
         - _norm_ppf
 - set_insurance
